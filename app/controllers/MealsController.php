@@ -37,35 +37,45 @@ class MealsController extends Controller
     }
 
 
-    //show a specific meal
+
+    private static function showMeal(int $mealId): ?array
+    {
+        $meal = self::getModel()->showMeal($mealId);
+        if (empty($meal)) {
+            $_SESSION['error'] = 'We have no such product.';
+            return null;
+        }
+        return $meal;
+    }
+
+    //showing meal for client
     public static function show()
     {
-        if (isset($_GET['meal_id'])) {
-            $meal = static::getModel()->showMeal($_GET['meal_id']);
-            if (empty($meal)) {
-                $_SESSION['error'] = 'We have no such product.';
-                header('location: index.php?action=meals');
-                exit();
-            } 
-            self::loadView('client/meals/meal', [
-                'meal' => $meal,
-                'mealsStatus' => 'active'
-            ]);
+        $meal = self::showMeal($_GET['meal_id']);
+        if ($meal) {
+            self::loadView('client/meals/meal', ['meal' => $meal, 'mealsStatus' => 'active']);
+            return;
         }
+        header('location: index.php?action=meals');
+        exit();
     }
 
-
-    // 'la fiche technique' of the meal
+    //showing meal for admin 
     public static function info()
     {
-        $meal_id = $_GET['meal_id'];
-        $meal = static::getModel()->showMeal($meal_id);
-        self::loadView('admin/meals/mealInfo', [
-            'meal' => $meal
-        ]);
+        $meal = self::showMeal($_GET['meal_id']);
+        if (empty($meal)) {
+            self::loadView('admin/meals/mealInfo', [
+                'meal' => $meal
+            ]);
+            exit();
+        }
+        header('location: index.php?adminAction=meals');
+        exit();
     }
 
 
+    // Adding a meal to the db
     public static function add()
     {
         self::loadView('admin/meals/addMeal');
@@ -74,17 +84,30 @@ class MealsController extends Controller
 
     public static function store()
     {
-        if ($_SERVER['REQUEST_METHOD'] == "POST") {
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
             extract($_POST);
-            //Verification des choses betbi3a
-            static::getModel()->setMealName($meal_name)
-                ->setMealPrice($meal_price)
-                ->setMealImageUrl($meal_image_url)
-                ->addMeal();
+            $_SESSION['errors'] = [];
+
+            //validating meal
+            if (empty($meal_name)) $_SESSION['errors'][] = "Meal name is required.";
+            if (empty($meal_price)) $_SESSION['errors'][] = "Meal name is required.";
+            if (!is_numeric($meal_price) || $meal_price <= 0)  $_SESSION['errors'][] = "Invalid meal price. Please enter a positive number.";
+
+            if (empty($_SESSION['errors'])) {
+                static::getModel()->setMealName($meal_name)
+                    ->setMealPrice($meal_price)
+                    ->setMealImageUrl($meal_image_url)
+                    ->addMeal();
+                $_SESSION['message'] = 'Meal added successfully';
+                header('location: index.php?adminAction=meals');
+                exit();
+            }
         }
-        header('location: index.php?adminAction=meals');
+        header('location: index.php?adminAction=addMeal');
+        exit();
     }
 
+    // Editing meal info in the db
     public static function edit()
     {
         if ($_SERVER['REQUEST_METHOD'] === "GET" && isset($_GET['meal_id'])) {
@@ -116,6 +139,7 @@ class MealsController extends Controller
         header('location: index.php?adminAction=meals');
     }
 
+    //Deleting a meal from the db
     public static function delete()
     {
         if ($_SERVER['REQUEST_METHOD'] === "GET" && isset($_GET['meal_id'])) {

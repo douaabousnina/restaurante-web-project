@@ -61,7 +61,8 @@ class UsersController extends Controller
                     'myAccountStatus' => 'active',
                     'user' => $user
                 ]);
-        } header('location: index.php?action=home');
+        } else 
+        header('location: index.php?action=home');
     }
 
 

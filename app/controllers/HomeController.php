@@ -26,7 +26,7 @@ class HomeController extends Controller
     public static function indexAdmin()
     {
 
-        if (@$_SESSION['autoriser'] != 'oui') {
+        if (@$_SESSION['authorized'] !== 'yes') {
             header('location: index.php?action=home');
             exit();
         }

@@ -48,7 +48,7 @@ class AuthController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             extract($_POST);
-            $errors = '';
+            $_SESSION['errors'] = '';
 
             if (!empty($user_login) && !empty($user_password)) {
                 $user = static::getModel()->where('user_login', $user_login);
@@ -56,10 +56,13 @@ class AuthController extends Controller
                 if (count($user) === 1) {
                     $user = $user[0];
 
-                    if ($user['user_password'] === $user_password) {
+                    echo password_hash($user_password, PASSWORD_BCRYPT).'<br>';
+                    echo $user['user_password'].'<br>';
+                    echo password_verify($user_password, $user['user_password']);
+
+                    if (password_verify($user_password, $user['user_password'])==true) {
                         if ($user['user_role'] === 1) {
-                            $_SESSION['admin'] = $user('user_id');
-                            setcookie('user_login_status', 'logged_in', time() + (24 * 60 * 60));
+                            $_SESSION['authorized'] = 'yes';
                         }
 
                         $_SESSION['user_login_status'] = 'logged_in';
@@ -70,19 +73,19 @@ class AuthController extends Controller
                                                 </div>';
 
                         setcookie('user_login_status', 'logged_in', time() + (24 * 60 * 60));
-
+                        session_regenerate_id(true);
                         header('location: index.php?action=home');
                     } else {
-                        $errors .= "<div class='alert alert-danger'>Invalid username or password</div>";
+                        $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid username or password</div>";
                     }
                 } else {
-                    $errors .= "<div class='alert alert-danger'>Invalid username or password</div>";
+                    $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid username or password</div>";
                 }
             } else {
-                $errors .= "<div class='alert alert-danger'>Username and password are required</div>";
+                $_SESSION['errors'] .= "<div class='alert alert-danger'>Username and password are required</div>";
             }
 
-            static::loadView('client/user/login', ['errors' => $errors]);
+            // static::loadView('client/user/login', ['errors' => isset($_SESSION['errors']) ? $_SESSION['errors'] : '']);
         } else {
             header('location: index.php?action=login');
         }
@@ -94,31 +97,33 @@ class AuthController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             extract($_POST);
 
-            $errors = "";
-            if ($user_surname === "" || strlen($user_surname) > 20) $errors .= "<div class='alert alert-danger'>Invalid name</div>";
-            if ($user_age < 18 || $user_age > 70) $errors .= "<div class='alert alert-danger'>Invalid age</div>";
-            if ($user_login === "" || strlen($user_login) > 30) $errors .= "<div class='alert alert-danger'>Invalid username format</div>";
-            if (strlen($user_password) < 10) $errors .= "<div class='alert alert-danger'>Password too short</div>";
+            $_SESSION['errors'] = "";
+            if ($user_surname === "" || strlen($user_surname) > 20) $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid name</div>";
+            if ($user_age < 18 || $user_age > 70) $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid age</div>";
+            if ($user_login === "" || strlen($user_login) > 30) $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid username format</div>";
+            // if (strlen($user_password) < 10) $_SESSION['errors'] .= "<div class='alert alert-danger'>Password too short</div>";
 
             //Checking uniqueness of login and password:
-            if (count(static::getModel()->where('user_email', $user_email)) === 1) $errors .= "<div class='alert alert-danger'>Email already used.</div>";
-            if (count(static::getModel()->where('user_login', $user_login)) === 1) $errors .= "<div class='alert alert-danger'>Login already used.</div>";
+            if (count(static::getModel()->where('user_email', $user_email)) === 1) $_SESSION['errors'] .= "<div class='alert alert-danger'>Email already used.</div>";
+            if (count(static::getModel()->where('user_login', $user_login)) === 1) $_SESSION['errors'] .= "<div class='alert alert-danger'>Login already used.</div>";
 
-            if ($errors == "") {
+            if ($_SESSION['errors'] == "") {
                 $isCreated = static::getModel()
                     ->setUserEmail($user_email)
                     ->setUserAge($user_age)
                     ->setUserLogin($user_login)
                     ->setUserSurname($user_surname)
-                    ->setUserPassword($user_password)
+                    ->setUserPassword(password_hash($user_password, PASSWORD_BCRYPT))
                     ->setUserRole(0)
                     ->addUser();
                 if ($isCreated === true) {
                     header('location: index.php?action=login');
                 } else
-                    $errors .= "<div class='alert alert-danger'>A database problem occurred</div>";
+                $_SESSION['errors'] .= "<div class='alert alert-danger'>A database problem occurred</div>";
             }
-            static::loadView('client/user/register', ['errors' => $errors]);
+            static::loadView('client/user/register', ['errors' => isset($_SESSION['errors']) ? $_SESSION['errors'] : '']);
+        } else {
+            header('location: index.php?action=register');
         }
     }
 
