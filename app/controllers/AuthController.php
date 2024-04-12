@@ -21,16 +21,20 @@ class AuthController extends Controller
 
     public static function getLoginView()
     {
+        $_SESSION['navActive'] = 'login';
+
         self::loadView('client/user/login', [
-            'errors' => '',
+            'error' => '',
             'registerStatus' => 'active'
         ]);
     }
 
     public static function getRegisterView()
     {
+        $_SESSION['navActive'] = 'register';        
+
         self::loadView('client/user/register', [
-            'errors' => '',
+            'error' => '',
             'registerStatus' => 'active'
         ]);
     }
@@ -45,10 +49,11 @@ class AuthController extends Controller
 
     public static function login()
     {
+        
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             extract($_POST);
-            $_SESSION['errors'] = '';
+            $_SESSION['error'] = '';
 
             if (!empty($user_login) && !empty($user_password)) {
                 $user = static::getModel()->where('user_login', $user_login);
@@ -56,75 +61,85 @@ class AuthController extends Controller
                 if (count($user) === 1) {
                     $user = $user[0];
 
-                    echo password_hash($user_password, PASSWORD_BCRYPT).'<br>';
-                    echo $user['user_password'].'<br>';
-                    echo password_verify($user_password, $user['user_password']);
+                    // $pwdCheck = password_verify($user_password, $user['user_password']);
+                    // if ($pwdCheck == true) {                     //? didnt work for some reason 
 
-                    if (password_verify($user_password, $user['user_password'])==true) {
+                    if ($user_password === $user['user_password']) {
                         if ($user['user_role'] === 1) {
                             $_SESSION['authorized'] = 'yes';
+                        } else {
+                            // Welcome message for normal users only
+                            $_SESSION['welcomeMessage'] = '<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                                <strong>Welcome back!</strong> We missed you.
+                                                           </div>';
+                            $_SESSION['welcome_message_shown'] = true;
                         }
 
-                        $_SESSION['user_login_status'] = 'logged_in';
-                        $_SESSION['welcome_message_shown'] = true;
                         $_SESSION['user_id'] = $user['user_id'];
-                        $_SESSION['message'] = '<div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                                    <strong>Welcome back!</strong> We missed you.
-                                                </div>';
+                        $_SESSION['user_login_status'] = 'logged_in';
 
-                        setcookie('user_login_status', 'logged_in', time() + (24 * 60 * 60));
-                        session_regenerate_id(true);
-                        header('location: index.php?action=home');
+
+                        // setcookie('user_login_status', 'logged_in', time() + (24 * 60 * 60)); 
+                        //? I dont really know the use of cookies :')
+
+                        echo 'test';
+                        // session_regenerate_id(true); // pour des raisons de securité ?
+                        header('location: index.php?action=home'); 
+                        exit();
                     } else {
-                        $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid username or password</div>";
+                        $_SESSION['error'] .= "<div class='alert alert-danger'>Invalid username or password</div>";
                     }
                 } else {
-                    $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid username or password</div>";
+                    $_SESSION['error'] .= "<div class='alert alert-danger'>Invalid username or password</div>";
                 }
             } else {
-                $_SESSION['errors'] .= "<div class='alert alert-danger'>Username and password are required</div>";
+                $_SESSION['error'] .= "<div class='alert alert-danger'>Username and password are required</div>";
             }
 
-            // static::loadView('client/user/login', ['errors' => isset($_SESSION['errors']) ? $_SESSION['errors'] : '']);
-        } else {
-            header('location: index.php?action=login');
         }
+
+        header('location: index.php?action=login');
     }
 
 
     public static function register()
     {
+        
+
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             extract($_POST);
 
-            $_SESSION['errors'] = "";
-            if ($user_surname === "" || strlen($user_surname) > 20) $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid name</div>";
-            if ($user_age < 18 || $user_age > 70) $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid age</div>";
-            if ($user_login === "" || strlen($user_login) > 30) $_SESSION['errors'] .= "<div class='alert alert-danger'>Invalid username format</div>";
-            // if (strlen($user_password) < 10) $_SESSION['errors'] .= "<div class='alert alert-danger'>Password too short</div>";
+            $_SESSION['error'] = "";
+            if ($user_surname === "" || strlen($user_surname) > 20) $_SESSION['error'] .= "<div class='alert alert-danger'>Invalid name</div>";
+            if (!isset($user_age) || $user_age < 18 || $user_age > 70) $_SESSION['error'] .= "<div class='alert alert-danger'>Invalid age</div>";
+            if ($user_login === "" || strlen($user_login) > 30) $_SESSION['error'] .= "<div class='alert alert-danger'>Invalid username format</div>";
+            if (strlen($user_password) < 7) $_SESSION['error'] .= "<div class='alert alert-danger'>Password too short</div>";
+
 
             //Checking uniqueness of login and password:
-            if (count(static::getModel()->where('user_email', $user_email)) === 1) $_SESSION['errors'] .= "<div class='alert alert-danger'>Email already used.</div>";
-            if (count(static::getModel()->where('user_login', $user_login)) === 1) $_SESSION['errors'] .= "<div class='alert alert-danger'>Login already used.</div>";
+            if (count(static::getModel()->where('user_email', $user_email)) === 1) $_SESSION['error'] .= "<div class='alert alert-danger'>Email already used.</div>";
+            if (count(static::getModel()->where('user_login', $user_login)) === 1) $_SESSION['error'] .= "<div class='alert alert-danger'>Login already used.</div>";
 
-            if ($_SESSION['errors'] == "") {
+            if ($_SESSION['error'] == "") {
+                // $hashedPassword = password_hash($user_password, PASSWORD_DEFAULT);
                 $isCreated = static::getModel()
                     ->setUserEmail($user_email)
                     ->setUserAge($user_age)
                     ->setUserLogin($user_login)
                     ->setUserSurname($user_surname)
-                    ->setUserPassword(password_hash($user_password, PASSWORD_BCRYPT))
+                    // ->setUserPassword($hashedPassword)
+                    ->setUserPassword($user_password)
                     ->setUserRole(0)
                     ->addUser();
                 if ($isCreated === true) {
                     header('location: index.php?action=login');
+                    exit();
                 } else
-                $_SESSION['errors'] .= "<div class='alert alert-danger'>A database problem occurred</div>";
+                    $_SESSION['error'] .= "<div class='alert alert-danger'>A database problem occurred</div>";
             }
-            static::loadView('client/user/register', ['errors' => isset($_SESSION['errors']) ? $_SESSION['errors'] : '']);
-        } else {
-            header('location: index.php?action=register');
         }
+
+        header('location: index.php?action=register');
     }
 
     public static function logout()
@@ -133,8 +148,8 @@ class AuthController extends Controller
 
         unset($_SESSION);
 
-        setcookie('user_login_status', '', time() - 3600);
-        unset($_COOKIE);
+        // setcookie('user_login_status', '', time() - 3600);
+        // unset($_COOKIE);
 
         header('location: index.php?action=login');
         exit();

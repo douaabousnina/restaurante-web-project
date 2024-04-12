@@ -13,6 +13,10 @@ ob_start();
     <h3>Meals 😋</h3>
     <br>
 
+    
+    <?= $message ?>
+    <?= $error ?>
+
     <div class="row justify-content-center">
         <?php foreach ($meals as $meal) : ?>
             <div class="col-sm-4 mb-4">

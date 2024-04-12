@@ -3,7 +3,10 @@ $title = "Home";
 ob_start(); ?>
 
 <br>
+<?= $welcomeMessage ?>
+
 <?= $message ?>
+<?= $error ?>
 
 <div class="container-sm">
     <div class="jumbotron">

@@ -2,6 +2,9 @@
 
 class Controller
 {
+
+
+
     public static function newModel($model)
     {
         require_once "app/models/" . $model . ".php";
@@ -13,7 +16,7 @@ class Controller
         if (file_exists('app/views/' . $view . '.php')) {
             if (!is_null($data)) extract($data);
 
-            // Pour verifier si on a 'register' or 'my account et logout'
+            // Pour verifier si on a 'register' or 'my account et logout'   (user *ordinaire* interface)
             $navElement = ' <li class="nav-item <?=$registerStatus?>">
                                 <a class="nav-link" href="index.php?action=register">Register now!</a>
                             </li>';
@@ -24,7 +27,7 @@ class Controller
                                         My account
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="index.php?action=editAccount&user_id='.$_SESSION['user_id'].'">Edit profile</a>
+                                        <a class="dropdown-item" href="index.php?action=editAccount&user_id=' . $_SESSION['user_id'] . '">Edit profile</a>
                                         <a class="dropdown-item" href="index.php?action=resetPassword">Reset password</a>
                                     </div> 
                                 </li>
@@ -32,6 +35,13 @@ class Controller
                                     <a class="nav-link" href="index.php?action=logout">Logout</a>
                                 </li>';
             }
+
+
+            $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+            $message = isset($_SESSION['message']) ? $_SESSION['message'] : '';
+
+            unset($_SESSION['message']);
+            unset($_SESSION['error']);
 
             require_once "app/views/" . $view . ".php";
         } else {

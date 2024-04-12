@@ -6,6 +6,11 @@ ob_start(); ?>
 <div class="container">
     <a href="index.php?action=meals">See other meals</a>
     <hr>
+
+    
+    <?= $message ?>
+    <?= $error ?>
+
     <div class="row">
         <div class="col-sm">
             <img src="<?= $meal['meal_image_url'] ?>" class="img-thumbnail">

@@ -53,11 +53,6 @@
             <strong>do3</strong>
         </a>
         <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-            <li><a class="dropdown-item" href="#">My account</a></li>
-            <li><a class="dropdown-item" href="#">Reset password</a></li>
-            <li>
-                <hr class="dropdown-divider">
-            </li>
             <li><a class="dropdown-item" href="index.php?action=logout">Sign out</a></li>
         </ul>
     </div>

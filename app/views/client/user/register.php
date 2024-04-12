@@ -46,7 +46,8 @@ ob_start(); ?>
 
     <br>
 
-    <?= $errors ?>
+    <?= $error ?>      
+    <?= $message ?>
 
 </div>
 

@@ -62,6 +62,9 @@ if (isset($_GET['action'])) {
         case 'updateAccount':
             UsersController::update();
             break;
+        // case 'deleteAccount':
+        //     UsersController::delete();
+        //     break;
 
 
             /*********** CART **************/

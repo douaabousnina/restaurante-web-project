@@ -20,7 +20,7 @@
       <div class="container">
         <div class="row">
           <h1 class="col-10"><?= $title ?></h1>
-          
+
 
           <?php
           echo isset($options) ? '<form method="post" id="sortBy" class="col" action="index.php?adminAction=' . $_GET["adminAction"] . '">
@@ -34,6 +34,9 @@
 
         <div>&nbsp;</div>
 
+        <?= $message ?>
+        <?= $error ?>
+        
         <?= $content ?>
       </div>
     </div>

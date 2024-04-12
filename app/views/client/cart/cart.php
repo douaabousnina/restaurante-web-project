@@ -23,6 +23,10 @@ ob_start(); ?>
 
     <hr>
 
+    <?= $message ?>
+    <?= $error ?>
+
+
     <?php
     foreach ($cartItems as $cartItem) :
         $meal = $cartItem['meal'];
@@ -62,7 +66,7 @@ ob_start(); ?>
         <hr>
     <?php endforeach; ?>
 
-    <?= $message  ?>
+<?= $cartMessage ?>
 
     <div class="row">
         <h2 class="col-8">Total</h2>

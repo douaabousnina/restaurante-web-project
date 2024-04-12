@@ -11,16 +11,18 @@ class CartController extends Controller
 
     public static function index()
     {
+        $_SESSION['navActive'] = 'cart';
+
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = [];
         }
 
         $cartItems = $_SESSION['cart'];
-        $message = count($cartItems) === 0 ? '<div class="alert alert-dark">Your cart is empty.</div>' : '';
+        $_SESSION['cartMessage'] = count($cartItems) === 0 ? '<div class="alert alert-dark">Your cart is empty.</div>' : '';
 
         self::loadView('client/cart/cart', [
             'cartItems' => $_SESSION['cart'],
-            'message' => $_SESSION['message'],
+            'cartMessage' =>$_SESSION['cartMessage'],
             'total' => self::calculateTotal(),
             'navElement' => '',
             'cartStatus' => 'active'  //! à revoir 
@@ -29,13 +31,15 @@ class CartController extends Controller
 
     public static function add()
     {
+        
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_GET['meal_id']) && isset($_POST['quantity'])) {
                 $meal_id = $_GET['meal_id'];
                 $quantity = $_POST['quantity'];
 
                 if(count(MealsController::getModel()->showMeal($meal_id))===0 || $quantity<=0) {
-                    $_SESSION['error']='No product / no quantity to add to cart';
+                    $_SESSION['error']='<div class="alert alert-danger">No product / no quantity to add to cart</div>';
                     header('location: index.php?action=home');
                     exit();
                 }
@@ -56,7 +60,7 @@ class CartController extends Controller
                     $_SESSION['cart'][] = $cartItem;
                 }
             } else {
-                $_SESSION['error'] = 'No product / no quantity to add to cart';
+                $_SESSION['error'] = '<div class="alert alert-danger">No product / no quantity to add to cart</div>';
             }
         }
         if (isset($_SERVER['HTTP_REFERER']))
@@ -71,6 +75,8 @@ class CartController extends Controller
 
     public static function remove()
     {
+        
+
         if (isset($_GET['meal_id'])) {
             $meal_id = $_GET['meal_id'];
             if ($meal_id > 0) {
@@ -78,9 +84,9 @@ class CartController extends Controller
                 if ($index != -1) {
                     unset($_SESSION['cart'][$index]);
                     $_SESSION['cart'] = array_values($_SESSION['cart']);
+                    $_SESSION['message'] = '<div class="alert alert-danger">Meal removed from cart 🔴</div>';  
                 }
-            } else 
-            $_SESSION['error'] = "Oups we don't have such a meal :(.";
+            }
         }
         header('location: index.php?action=cart');
     }
@@ -88,19 +94,24 @@ class CartController extends Controller
 
     public static function clear()
     {
+        
+
         $_SESSION['cart'] = [];
+        $_SESSION['message'] = '<div class="alert alert-success">Cart cleared ✅</div>';
         header('location: index.php?action=cart');
     }
 
 
     public static function calculateTotal(): string
     {
+        
+
         $total = 0;
         if (isset($_SESSION['cart'])) {
             foreach ($_SESSION['cart'] as $cartItem) {
                 $meal = $cartItem['meal'];
-                $price = floatval($meal['meal_price']);
-                $quantity = intval($cartItem['quantity']);
+                $price = $meal['meal_price'];
+                $quantity = $cartItem['quantity'];
                 $total += $price * $quantity;
             }
         }
@@ -113,6 +124,8 @@ class CartController extends Controller
      */
     public static function findMealInCart($meal_id): int
     {
+        
+
         if (isset($_SESSION['cart'])) {
             $index = -1;
             foreach ($_SESSION['cart'] as $item) {
