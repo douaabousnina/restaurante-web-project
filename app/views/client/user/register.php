@@ -12,6 +12,9 @@ ob_start(); ?>
             <div class="form-group col-md-4">
                 <label>Email</label>
                 <input type="email" class="form-control" name="user_email" placeholder="Email">
+                <small class="text-muted">
+                    Enter a valid email, you'll receive a welcome email!
+                </small>
             </div>
             <div class="form-group col-md-4">
                 <label>Age</label>
@@ -33,7 +36,7 @@ ob_start(); ?>
                 <label>Password</label>
                 <input type="password" class="form-control" name="user_password" placeholder="Password">
                 <small class="text-muted">
-                    Must be 8-20 characters long.
+                    Must be at least 7 characters long.
                 </small>
             </div>
         </div>
@@ -46,7 +49,7 @@ ob_start(); ?>
 
     <br>
 
-    <?= $error ?>      
+    <?= $error ?>
     <?= $message ?>
 
 </div>

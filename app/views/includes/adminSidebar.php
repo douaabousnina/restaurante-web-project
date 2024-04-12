@@ -50,7 +50,7 @@
             <span class="material-symbols-outlined rounded-circle me-2" width="32" height="32">
                 account_circle
             </span>
-            <strong>do3</strong>
+            <strong>admin</strong>
         </a>
         <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
             <li><a class="dropdown-item" href="index.php?action=logout">Sign out</a></li>

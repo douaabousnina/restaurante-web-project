@@ -24,7 +24,7 @@
 
     <footer>
         <div class="container">
-            <p>All rights reserved ll do3 + Bootstrap mon amour ❤️</p>
+            <p>All rights reserved ll admin + Bootstrap mon amour ❤️</p>
 
         </div>
     </footer>

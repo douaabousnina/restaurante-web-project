@@ -130,7 +130,7 @@ class UserModel
     public function addUser(): bool
     {
         $sqlState = $this->pdo->prepare("INSERT INTO users (user_email, user_surname, user_age, user_login, user_password, user_role) VALUES (?,?,?,?,?,?)");
-        return $sqlState->execute(array($this->user_email, $this->user_surname, $this->user_age, $this->user_login, password_hash($this->user_password, PASSWORD_DEFAULT), $this->user_role));
+        return $sqlState->execute(array($this->user_email, $this->user_surname, $this->user_age, $this->user_login, $this->user_password, $this->user_role));
     }
 
 
@@ -149,14 +149,6 @@ class UserModel
         return $sqlState->execute(array($this->user_email, $this->user_surname, $this->user_age, $this->user_login, $this->user_role, $user_id));
     }
 
-
-    /**
-     * @param int $user_id
-     */
-    public function changePassword($user_id) {
-        $sqlState = $this->pdo->prepare("UPDATE users SET user_password=? WHERE user_id=?");
-        return $sqlState->execute(array(password_hash($this->user_password, PASSWORD_DEFAULT), $user_id));
-    }
 
 
     /**

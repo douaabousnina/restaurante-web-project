@@ -3,12 +3,14 @@ $title = "Home";
 ob_start(); ?>
 
 <br>
-<?= $welcomeMessage ?>
-
-<?= $message ?>
-<?= $error ?>
 
 <div class="container-sm">
+
+    <?= $welcomeMessage ?>
+
+    <?= $message ?>
+    <?= $error ?>
+
     <div class="jumbotron">
         <h1 class="display-4">Craving a delicious meal?</h1>
         <p class="lead">You came to the right place 🫡</p>

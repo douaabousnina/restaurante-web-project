@@ -7,7 +7,7 @@ ob_start();
 
 <div class="container">
     <div class="alert alert-primary">
-        Welcome, do3! 🥰
+        Welcome, admin! 🥰
     </div>
 
     <div class="container">
