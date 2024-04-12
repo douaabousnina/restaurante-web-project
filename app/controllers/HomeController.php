@@ -12,16 +12,15 @@ class HomeController extends Controller
     {
         $_SESSION['navActive'] = 'home';
 
-        if (isset($_SESSION['welcome_message_shown']) && $_SESSION['welcome_message_shown'] === true) {
-            $welcomeMessage = isset($_SESSION['welcomeMessage']) ? $_SESSION['welcomeMessage'] : '';
-            $_SESSION['welcome_message_shown'] = false; //welcome message affiché only once .
-        }
+        $welcomeMessage= isset($_SESSION['welcomeMessage'])?  $_SESSION['welcomeMessage'] : '';
+        unset($_SESSION['welcomeMessage']);
+
 
         $meals = MealsController::getModel()->showAllMeals();
 
         self::loadView("client/home", [
             'meals' => $meals,
-            'welcomeMessage' => isset($welcomeMessage) ? $welcomeMessage : '',
+            'welcomeMessage' => $welcomeMessage,
             'homeStatus' => 'active' //! Mal9itech 7al ekher honestly
         ]);
     }
@@ -41,6 +40,9 @@ class HomeController extends Controller
 
     public static function error()
     {
-        self::loadView('error');
+        if(@$_SESSION['authorized']==='yes') {
+            self::loadView('admin/error');
+        }
+        self::loadView('client/error');
     }
 }

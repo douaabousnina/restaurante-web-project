@@ -84,6 +84,9 @@ if (isset($_GET['action'])) {
         case 'setQuantity':
             CartController::setQuantity();
             break;
+        case 'addOrder':
+            OrdersController::add();
+            break;
 
 
         default:

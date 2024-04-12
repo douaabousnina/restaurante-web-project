@@ -9,7 +9,7 @@
     <ul class="nav nav-pills flex-column mb-auto">
 
         <li class="nav-item">
-            <a href="index.php?adminAction=home" class="nav-link active" aria-current="page">
+            <a href="index.php?adminAction=home" class="nav-link link-dark" aria-current="page">
                 <span class="material-symbols-outlined bi me-2">
                     dashboard
                 </span>

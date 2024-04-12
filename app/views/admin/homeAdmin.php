@@ -66,7 +66,7 @@ ob_start();
                 </table>
             </div>
 
-            <a class="btn btn-info col-2 align-self-center" href="index.php?adminAction=orders">Show all orders</a>
+            <a class="btn btn-success col-2 align-self-center" href="index.php?adminAction=orders">Show all orders</a>
             <h6>&nbsp;</h6>
         </div>
     </div>

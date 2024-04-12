@@ -31,7 +31,7 @@ class AuthController extends Controller
 
     public static function getRegisterView()
     {
-        $_SESSION['navActive'] = 'register';        
+        $_SESSION['navActive'] = 'register';
 
         self::loadView('client/user/register', [
             'error' => '',
@@ -39,17 +39,16 @@ class AuthController extends Controller
         ]);
     }
 
-    public static function getResetPasswordView()
-    {
-    }
-    //Etc.
+    // public static function getResetPasswordView()
+    // {
+    // }
 
 
     // Logic : 
 
     public static function login()
     {
-        
+
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             extract($_POST);
@@ -65,26 +64,23 @@ class AuthController extends Controller
                     // if ($pwdCheck == true) {                     //? didnt work for some reason 
 
                     if ($user_password === $user['user_password']) {
+
+                        $_SESSION['user_id'] = $user['user_id'];
+                        $_SESSION['user_login_status'] = 'logged_in';
+
                         if ($user['user_role'] === 1) {
                             $_SESSION['authorized'] = 'yes';
+                            header('location: index.php?adminAction=home');
+                            exit();
                         } else {
                             // Welcome message for normal users only
                             $_SESSION['welcomeMessage'] = '<div class="alert alert-warning alert-dismissible fade show" role="alert">
                                                                 <strong>Welcome back!</strong> We missed you.
                                                            </div>';
-                            $_SESSION['welcome_message_shown'] = true;
                         }
 
-                        $_SESSION['user_id'] = $user['user_id'];
-                        $_SESSION['user_login_status'] = 'logged_in';
-
-
-                        // setcookie('user_login_status', 'logged_in', time() + (24 * 60 * 60)); 
-                        //? I dont really know the use of cookies :')
-
-                        echo 'test';
-                        // session_regenerate_id(true); // pour des raisons de securité ?
-                        header('location: index.php?action=home'); 
+                        session_regenerate_id(true); // pour des raisons de securité ?
+                        header('location: index.php?action=home');
                         exit();
                     } else {
                         $_SESSION['error'] .= "<div class='alert alert-danger'>Invalid username or password</div>";
@@ -95,7 +91,6 @@ class AuthController extends Controller
             } else {
                 $_SESSION['error'] .= "<div class='alert alert-danger'>Username and password are required</div>";
             }
-
         }
 
         header('location: index.php?action=login');
@@ -104,7 +99,7 @@ class AuthController extends Controller
 
     public static function register()
     {
-        
+
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             extract($_POST);
@@ -122,16 +117,17 @@ class AuthController extends Controller
 
             if ($_SESSION['error'] == "") {
                 // $hashedPassword = password_hash($user_password, PASSWORD_DEFAULT);
+
                 $isCreated = static::getModel()
                     ->setUserEmail($user_email)
                     ->setUserAge($user_age)
                     ->setUserLogin($user_login)
                     ->setUserSurname($user_surname)
-                    // ->setUserPassword($hashedPassword)
                     ->setUserPassword($user_password)
                     ->setUserRole(0)
                     ->addUser();
                 if ($isCreated === true) {
+                    $_SESSION['message'] = "<div class='alert alert-success'>You are now one of us 🥰 Check your mail to see a welcome message!</div>";
                     header('location: index.php?action=login');
                     exit();
                 } else
@@ -151,22 +147,19 @@ class AuthController extends Controller
         // setcookie('user_login_status', '', time() - 3600);
         // unset($_COOKIE);
 
-        header('location: index.php?action=login');
+        header('location: index.php?action=home');
         exit();
     }
 
-    public static function forgotPassword()
-    {
-        // Logic for handling password reset requests
-    }
+    // public static function forgotPassword()
+    // {
+    // }
 
-    public static function resetPassword()
-    {
-        // Logic for resetting the user's password
-    }
+    // public static function resetPassword()
+    // {
+    // }
 
-    public static function verifyEmail()
-    {
-        // Logic for verifying the user's email for account activation
-    }
+    // public static function verifyEmail()
+    // {
+    // }
 }

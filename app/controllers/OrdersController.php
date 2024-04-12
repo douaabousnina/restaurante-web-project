@@ -65,15 +65,56 @@ class OrdersController extends Controller
 
     public static function delete()
     {
-
-
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['order_id'])) {
             $isDeleted = static::getModel()->deleteOrder($_GET['order_id']);
             if ($isDeleted === true)
-                    $_SESSION['message'] = "<div class='alert alert-danger'>Order deleted successfully.</div>";
-                else
-                    $_SESSION['error'] .= '<div class="alert alert-danger">Cannot delete order.</div>';
+                $_SESSION['message'] = "<div class='alert alert-danger'>Order deleted successfully.</div>";
+            else
+                $_SESSION['error'] .= '<div class="alert alert-danger">Cannot delete order.</div>';
         }
         header('location: index.php?adminAction=orders');
+    }
+
+
+
+    public static function add()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && @$_SESSION['user_login_status'] === 'logged_in') {
+
+            if (!isset($_SESSION['user_id'])) {
+            }
+
+            $user_id = $_SESSION['user_id'];
+
+            $cartItems = $_SESSION['cart'];
+            unset($_SESSION['cart']);  // Vider le panier
+
+            foreach ($cartItems as $cartItem) {     // Iterating cart elements and adding them to the orders
+
+                $orderedMeal = $cartItem['meal'];   //khater every cart item has 2 attributs : 'meal' et 'quantity'
+
+                for ($i = 1; $i <= $cartItem['quantity']; $i++) {  // adding meal selon quantity
+                    $isOrdered = self::getModel()->setOrderDate(date('Y-m-d'))
+                        ->setUserId($user_id)
+                        ->setMealId($orderedMeal['meal_id'])
+                        ->setOrderStatus('Pending')
+                        ->addOrder();
+
+                    if ($isOrdered == true)
+                        $_SESSION['message'] = "<div class='alert alert-success'>Your order was placed successfully!✅</div>";
+                    else {
+                        $_SESSION['error'] = "<div class='alert alert-danger'>A database problem occurred</div>";
+                        break;
+                    }
+                }
+            }
+            header('location: index.php?action=cart');
+            exit();
+        } else {
+            if (@$_SESSION['user_login_status'] !== 'logged_in')
+                $_SESSION['error'] = "<div class='alert alert-danger'>You have to log in to pass an order!</div>";
+            header('location: index.php?action=home');
+            exit();
+        }
     }
 }

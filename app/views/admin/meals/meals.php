@@ -8,7 +8,7 @@ ob_start();
 ?>
 
 <div class="row justify-content-center">
-    <a href="index.php?adminAction=addMeal" class="btn btn-info col-1">Add meal</a>
+    <a href="index.php?adminAction=addMeal" class="btn btn-success col-1">Add meal</a>
 </div>
 <br>
 <div class="row justify-content-center">

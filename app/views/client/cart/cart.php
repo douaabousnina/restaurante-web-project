@@ -66,7 +66,10 @@ ob_start(); ?>
         <hr>
     <?php endforeach; ?>
 
-<?= $cartMessage ?>
+
+    <?php 
+        echo $message=="" ? $cartMessage : ""; 
+    ?>
 
     <div class="row">
         <h2 class="col-8">Total</h2>
@@ -74,7 +77,16 @@ ob_start(); ?>
         <h2 class="col">TND</h2>
     </div>
 
+    <?php echo $cartMessage !== "" ? "" : '
+        <br>
+        <form method="post" action="index.php?action=addOrder">
+            <button type="submit"class="btn btn-success">Confirm order</button>
+        </form>    
+    '; ?>
+
 </div>
+
+
 
 
 <script>

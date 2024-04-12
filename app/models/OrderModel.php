@@ -9,6 +9,7 @@ class OrderModel
     private $order_id;
     private $order_date;
     private $order_status;
+    
     //clés étrangères:
     private $meal_id;
     private $user_id;

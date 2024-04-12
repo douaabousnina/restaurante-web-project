@@ -1,6 +1,5 @@
 <?php
 $title = "Account";
-var_dump($_SESSION);
 ob_start(); ?>
 
 <div class="container">
